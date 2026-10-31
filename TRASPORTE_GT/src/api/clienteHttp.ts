@@ -37,7 +37,9 @@ async function leerErrorBinario(error: unknown) {
 export function crearClienteHttp(baseURL: string): AxiosInstance {
   const cliente = axios.create({
     baseURL,
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    // Sin Content-Type fijo: axios pone application/json a los objetos y, con FormData, el navegador manda
+    // multipart con su boundary. Un JSON por omisión hace que axios convierta el FormData en JSON (sin archivo).
+    headers: { Accept: 'application/json' },
   })
 
   cliente.interceptors.request.use((config) => {

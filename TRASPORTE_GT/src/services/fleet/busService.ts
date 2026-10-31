@@ -62,7 +62,7 @@ export function cambiarEstadoOperativoBus(
 export function subirFotoBus(id: string, archivo: File, signal?: AbortSignal) {
   const datos = new FormData()
   datos.append('archivo', archivo)
-  // Con FormData axios quita el Content-Type JSON por omisión y el navegador pone el boundary.
+  // FormData: el navegador manda multipart con su boundary (el cliente no fija Content-Type).
   return solicitar<Bus>({ method: 'POST', url: `/buses/${id}/foto`, data: datos, signal }, clienteFlota)
 }
 
