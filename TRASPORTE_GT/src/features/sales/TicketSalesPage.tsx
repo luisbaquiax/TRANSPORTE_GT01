@@ -8,6 +8,7 @@ import { Icon } from '../../components/ui/Icon'
 import { SectionTitle } from '../../components/ui/Misc'
 import { useMapaAsientos, useVenderEnMostrador, useViajesALaVenta } from '../../hooks/tickets'
 import { MAX_ASIENTOS_POR_COMPRA, type Compra } from '../../types/ticketTypes'
+import { PATRON_NIT } from '../../types/customerWalletTypes'
 import { etiquetaAsiento, indicesOcupados, numeroAsiento, ordenarEtiquetas } from '../../utils/asientos'
 import { formatFechaCorta, formatFechaHora, formatHora, formatMonto, formatQ, hoyIso } from '../../utils/format'
 import { nuevaClaveIdempotencia } from '../../utils/idempotencia'
@@ -91,6 +92,8 @@ export function TicketSalesPage() {
     viajes.recargar()
   }
 
+  // Sin NIT queda como CF; si se escribió uno, debe tener 8 o 9 dígitos.
+  const nitAceptable = generico || nit === '' || PATRON_NIT.test(nit)
   const puedeContinuar = step === 1 ? Boolean(selectedTrip) : step === 2 ? seleccion.length > 0 : true
 
   if (!idSucursal) {
@@ -329,7 +332,7 @@ export function TicketSalesPage() {
               </Button>
             )}
             {step === 3 && (
-              <Button onClick={registrar} disabled={vender.cargando || !seleccion.length}>
+              <Button onClick={registrar} disabled={vender.cargando || !seleccion.length || !nitAceptable}>
                 {vender.cargando ? 'Registrando...' : 'Registrar venta'}
               </Button>
             )}

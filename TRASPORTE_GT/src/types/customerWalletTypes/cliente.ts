@@ -32,6 +32,7 @@ export interface ActualizarPerfilClienteRequest {
 }
 
 /** Mismas validaciones que `ActualizarPerfilRequest` del backend. */
+export const PATRON_NIT = /^[0-9]{8,9}$/
 export const PATRON_DPI = /^[0-9]{13}$/
 export const PATRON_TELEFONO = /^[0-9+\- ]{8,20}$/
 
