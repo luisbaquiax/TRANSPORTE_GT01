@@ -4,7 +4,7 @@ import { AvisoError } from '../../components/ui/Estado'
 import { Field } from '../../components/ui/Field'
 import { Avatar } from '../../components/ui/Misc'
 import { useBuscarClientePorNit } from '../../hooks/customerWallet'
-import type { ClienteBusqueda } from '../../types/customerWalletTypes'
+import { PATRON_NIT, type ClienteBusqueda } from '../../types/customerWalletTypes'
 
 interface BuscarClienteNitProps {
   onEncontrado?: (cliente: ClienteBusqueda | null) => void
@@ -18,12 +18,11 @@ export function BuscarClienteNit({ onEncontrado, onNitChange, deshabilitado = fa
   const { ejecutar, cargando, error, reiniciar } = useBuscarClientePorNit()
   const [nit, setNit] = useState('')
   const [cliente, setCliente] = useState<ClienteBusqueda | null>(null)
-  const generico = nit.trim().toUpperCase() === 'CF'
+  const valido = PATRON_NIT.test(nit)
 
   const buscar = async () => {
-    const valor = nit.trim()
-    if (!valor || generico || cargando || deshabilitado) return
-    const resultado = await ejecutar(valor)
+    if (!valido || cargando || deshabilitado) return
+    const resultado = await ejecutar(nit)
     const encontrado = resultado.ok ? resultado.datos : null
     setCliente(encontrado)
     onEncontrado?.(encontrado)
@@ -34,18 +33,21 @@ export function BuscarClienteNit({ onEncontrado, onNitChange, deshabilitado = fa
       <Field
         label="NIT del cliente"
         action={
-          <button type="button" className="text-button" onClick={buscar} disabled={cargando || !nit.trim() || generico || deshabilitado}>
+          <button type="button" className="text-button" onClick={buscar} disabled={cargando || !valido || deshabilitado}>
             {cargando ? 'Buscando...' : 'Buscar'}
           </button>
         }
       >
         <input
-          placeholder="CF / 1234567-8"
+          placeholder="123456789"
+          inputMode="numeric"
+          maxLength={9}
           value={nit}
           disabled={deshabilitado}
           onChange={(event) => {
-            setNit(event.target.value)
-            onNitChange?.(event.target.value)
+            const valor = event.target.value.replace(/[^0-9]/g, '')
+            setNit(valor)
+            onNitChange?.(valor)
             setCliente(null)
             reiniciar()
             onEncontrado?.(null)
@@ -58,6 +60,7 @@ export function BuscarClienteNit({ onEncontrado, onNitChange, deshabilitado = fa
           }}
         />
       </Field>
+      {nit !== '' && !valido && !deshabilitado && <small className="cell-note">El NIT debe tener entre 8 y 9 dígitos.</small>}
       {cliente && (
         <div className="person-card">
           <Avatar name={cliente.nombreCompleto} small />

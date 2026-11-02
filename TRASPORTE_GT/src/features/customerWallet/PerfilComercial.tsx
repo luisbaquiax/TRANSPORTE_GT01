@@ -5,14 +5,14 @@ import { AvisoError, Cargando } from '../../components/ui/Estado'
 import { Field } from '../../components/ui/Field'
 import { Icon } from '../../components/ui/Icon'
 import { useEditarPerfilCliente, usePerfilCliente } from '../../hooks/customerWallet'
-import { PATRON_DPI, PATRON_TELEFONO, type Cliente } from '../../types/customerWalletTypes'
+import { PATRON_DPI, PATRON_NIT, PATRON_TELEFONO, type Cliente } from '../../types/customerWalletTypes'
 import { AvisoCartera } from './AvisoCartera'
 
 const texto = (valor: string) => valor.trim() || null
 
 function validar(campos: { nit: string; dpi: string; telefono: string }): ApiError | null {
   const invalido = (mensaje: string) => new ApiError(400, 'VALIDACION_FALLIDA', mensaje)
-  if (campos.nit !== '' && !/^[0-9]{9}$/.test(campos.nit)) return invalido('El NIT debe tener exactamente 9 dígitos.')
+  if (campos.nit !== '' && !PATRON_NIT.test(campos.nit)) return invalido('El NIT debe tener entre 8 y 9 dígitos.')
   if (campos.dpi.trim() && !PATRON_DPI.test(campos.dpi.trim())) return invalido('El DPI debe tener 13 dígitos.')
   if (campos.telefono.trim() && !PATRON_TELEFONO.test(campos.telefono.trim()))
     return invalido('El teléfono debe tener entre 8 y 20 caracteres: dígitos, espacios, + y -.')
@@ -52,7 +52,7 @@ function FormularioPerfil({
   return (
     <form className="profile-edit-form" onSubmit={guardar}>
       <div className="form-grid two">
-        <Field label="NIT" placeholder="123456789" value={nit} onChange={(event) => setNit(event.target.value.replace(/[^0-9]/g, ''))} minLength={9} maxLength={9} />
+        <Field label="NIT" placeholder="123456789" value={nit} onChange={(event) => setNit(event.target.value.replace(/[^0-9]/g, ''))} minLength={8} maxLength={9} />
         <Field label="DPI" placeholder="2456789010101" value={dpi} onChange={(event) => setDpi(event.target.value.replace(/[^0-9]/g, ''))} minLength={13} maxLength={13} />
         <Field
           label="Teléfono"
